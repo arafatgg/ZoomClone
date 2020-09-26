@@ -5,9 +5,10 @@ const videoGrid = document.getElementById('video-grid');
 let peer = new Peer(null, {
   path: '/peerjs',
   host: '/',
-  port: '443'
+  port: '3030'
 });
-
+const mainChatWindow = document.querySelector('.main__chat__window');
+let msg = document.querySelector('#chat_message');
 const addVideoStream = (_video, _stream) => {
   _video.srcObject = _stream;
   _video.addEventListener('loadedmetadata', () => _video.play());
@@ -52,3 +53,67 @@ navigator.mediaDevices
 peer.on('open', id => {
   socket.emit('join-room', ROOM_ID, id);
 });
+
+socket.on('createMessage', msg => {
+  const li = document.createElement('li');
+  li.innerHTML = `<b class = 'text-success'>User:</b> <br/>  ${msg}`;
+  document.querySelector('.messages').append(li);
+  mainChatWindow.scrollTop = mainChatWindow.scrollHeight;
+});
+const setUnmuteButton = () => {
+  let html = `
+<i class="_red fas fa-microphone-slash"></i>
+              <span>Unmute</span>
+`;
+  document.querySelector('.main__mute__button').innerHTML = html;
+};
+const setMuteButton = () => {
+  let html = `
+<i class="fas fa-microphone"></i>
+              <span>Mute</span>
+`;
+  document.querySelector('.main__mute__button').innerHTML = html;
+};
+const muteUnmute = () => {
+  const enabled = myVideoStream.getAudioTracks()[0].enabled;
+  if (enabled) {
+    myVideoStream.getAudioTracks()[0].enabled = false;
+    setUnmuteButton();
+  } else {
+    myVideoStream.getAudioTracks()[0].enabled = true;
+    setMuteButton();
+  }
+};
+const setStopButton = () => {
+  let html = `
+  <i class=" _red fas fa-video-slash"></i>
+  <span>Stop Video</span>
+`;
+  document.querySelector('.main__videoControl__button').innerHTML = html;
+};
+const setPlayButton = () => {
+  let html = `
+  <i class="fas fa-video"></i>
+  <span>Play Video</span>
+`;
+  document.querySelector('.main__videoControl__button').innerHTML = html;
+};
+
+const togglePlayVideo = () => {
+  const enabled = myVideoStream.getVideoTracks()[0].enabled;
+  if (enabled) {
+    myVideoStream.getVideoTracks()[0].enabled = false;
+    setStopButton();
+  } else {
+    myVideoStream.getVideoTracks()[0].enabled = true;
+    setPlayButton();
+  }
+};
+
+
+window.onkeydown = e => {
+  if (e.which == 13 && msg.value !== 0) {
+    socket.emit('message', msg.value);
+    msg.value = '';
+  }
+};

@@ -5,7 +5,7 @@ const videoGrid = document.getElementById('video-grid');
 let peer = new Peer(null, {
   path: '/peerjs',
   host: '/',
-  port: '3030'
+  port: '443'
 });
 const mainChatWindow = document.querySelector('.main__chat__window');
 let msg = document.querySelector('#chat_message');
@@ -109,7 +109,6 @@ const togglePlayVideo = () => {
     setPlayButton();
   }
 };
-
 
 window.onkeydown = e => {
   if (e.which == 13 && msg.value !== 0) {
